@@ -14,11 +14,25 @@ SECTIONS
     *(.text .text.*)
   }
 
+  .rodata : {
+    *(.rodata .rodata.*)
+  }
+
   .data : {
     *(.data .data.*)
   }
 
   .bss : {
+    . = ALIGN(16);
+    __bss_start = .;
     *(.bss .bss.*)
+    . = ALIGN(16);
+    __bss_end = .;
+  }
+  
+  .stack (NOLOAD): ALIGN(4096) {
+
+    . += 16k;
+    __stack_top = .;
   }
 }
