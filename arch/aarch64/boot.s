@@ -15,9 +15,28 @@ _start:
     add     x1, x1, :lo12:__stack_top
     mov     sp, x1
 
-    /* TODO: zero .bss and call kernel_main. */
+    /* Zero .bss, 16 bytes at a time. */
+    adrp x1, __bss_start
+    add x1, x1, :lo12:__bss_start
+    adrp x2, __bss_end
+    add x2, x2, :lo12:__bss_end
+
+.Lbss_loop:
+    cmp x1, x2
+    b.hs .Lbss_done
+    stp xzr, xzr, [x1], #16
+    b .Lbss_loop
+    
+.Lbss_done:
+    /* TODO: call kernel_main. */
 
 .Lpark:
     /* Sleep until an event, then sleep again. */
     wfe
     b       .Lpark
+
+    .section .bss.test, "aw", %nobits
+    .balign 16
+test_var:
+    .skip 32
+
